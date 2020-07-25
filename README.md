@@ -1,10 +1,10 @@
 # HackerApiViewerProject
 ## Content
 ### HackerApiViewer (Angular 10.0.4 Client Front End)
-  * npm install (install dependencies)
+  * npm install (installs dependencies including cypress)
   * ng serve to run client
-  * Unit Testing via Jasmine/Karma
-  * Integration Testing via Cypress.io
+  * Unit Testing via Jasmine/Karma (ng test)
+  * Integration Testing via https:cypress.io (npx cypress open)
 ### HackerApiClient (Api Client Backend)
   * dotnet restore
   * dotnet build
