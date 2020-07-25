@@ -1,15 +1,13 @@
 # HackerApiViewerProject
 ## Content
 ### HackerApiViewer (Angular 10.0.4 Client Front End)
+  * cd into Client folder
   * npm install (installs dependencies including cypress)
   * ng serve to run client
   * Unit Testing via Jasmine/Karma (ng test)
   * Integration Testing via https:cypress.io (npx cypress open)
 ### HackerApiClient (Api Client Backend)
-  * dotnet restore
-  * dotnet build
-  * dotnet run
-  * (Or launch via Visual Studio)
+  * run /HackerAPI-Project/hackerAPIServer/hackerAPI.Client.sln in Visual Studio (compiled in vs2019)
   * Unit Testing via xUnit (no Moq on this release)
 #### Features
   * https://localhost:5001/swagger => Swagger API
