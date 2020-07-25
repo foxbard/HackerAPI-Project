@@ -29,4 +29,4 @@
 # Notes
 * I kept the testing small, as I just wanted to show that I can do integrated and unit testing. In a real world situation this would be much more extensive, especially for endpoints
 * All tests passed on my local (famous last words lol)
-* wanted to add a lot of things like making sure observables are unsubcribed, as well as managing handling of incoming data in a different way. Also wanted to add so that caching is used on backend to handle data, api data being sent to Client.
+* wanted to add a lot of things like making sure observables are unsubcribed, as well as managing handling of incoming data in a different way. Also wanted to add so that caching is used on backend to handle data, api data being sent to client, decided to wrap it up though.
