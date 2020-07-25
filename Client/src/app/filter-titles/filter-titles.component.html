@@ -1,0 +1,26 @@
+
+<mat-form-field class="full-form">
+  <input
+    type="text"
+    placeholder = "Search/Filter Stories, click link to story to open in new browser tab."
+    aria-label = "Stories"
+    matInput
+    [formControl]="filterControl"
+    [matAutocomplete]="auto">
+  <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+    <ng-container *ngFor="let story of filteredOptions | async">
+      <mat-option  [value]="story.title" *ngIf="story!== null">
+        <div class="story-items">
+          <div class="story-item ">
+            <a href={{story.url}} target="_blank">{{story.title}}</a>
+          </div>
+          <div class="story-item author">
+            {{story.by}}
+          </div>
+        </div>
+      </mat-option>
+    </ng-container>
+
+  </mat-autocomplete>
+</mat-form-field>
+

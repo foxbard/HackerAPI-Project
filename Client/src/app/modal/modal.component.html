@@ -1,0 +1,22 @@
+<div class="modal-card-wrapper">
+  <mat-progress-bar *ngIf="buffering" mode="buffer">
+
+  </mat-progress-bar>
+  <div>Story Author Info</div>
+  <mat-card class="user-card">
+    <mat-card-title>{{user.id}}</mat-card-title>
+    <mat-card-subtitle>About: {{user.about}}</mat-card-subtitle>
+    <mat-card-content>
+      User Submitted Stories:
+      <button mat-button [matMenuTriggerFor]="menu">Show Submitted Stories</button>
+      <mat-menu #menu="matMenu">
+        <mat-list-item *ngFor="let item of user.submitted" (click)="selectStoryEvent($event)" (itemValue)="item">
+          {{item}}
+        </mat-list-item>
+      </mat-menu>
+      <app-error [showError]="showError" [errorMessage]="errorMessage"></app-error>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+
