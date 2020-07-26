@@ -11,6 +11,7 @@
   * Unit Testing via xUnit (no Moq on this release)
 #### Features
   * https://localhost:5001/swagger => Swagger API
+  * redis for backend caching (referd to readme under Redis directory)
   
 ## What it does:
 * Uses the awesome HackerNews API https://github.com/HackerNews/API to pull newest, best or top stories and angular material to make it look good :D!
@@ -19,6 +20,7 @@
 * A user can be selected and their info viewed
 * A users list of submitted story items can be viewed and the value clicked to redirect to link in a new tab.
 * Sorting of items via table headers
+* Progress Bars (needed for intial caching :D)
 * Pagination 
 * Selection of 3 possible categories of stories via hamburger menu.
 * Error messaging when clicking on link that does not have a url in user submitted stories.
