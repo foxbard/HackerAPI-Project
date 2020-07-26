@@ -34,7 +34,7 @@
     <ng-container matColumnDef="link">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Link</th>
       <ng-template ngIf="row.url else noUrl">
-        <td mat-cell *matCellDef="let row"><a href={{row.url}}>Story Link</a></td>
+        <td mat-cell *matCellDef="let row"><a href={{row.url}} target="_blank">Story Link</a></td>
       </ng-template>
       <ng-template #noUrl>
         <td mat-cell *matCellDef="let row">No URL</td>

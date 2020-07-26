@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30014.187
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "hackerAPI.Client", "hackerAPI.Client.csproj", "{3367DAE0-D9BA-43BB-96B0-1168BAFC14D4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HackerAPIClient.Integration.Test", "..\HackerApiClientTests\HackerAPIClient.Integration.Test.csproj", "{577EB591-4C36-4D19-B0EF-12C4F1FA4FD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HackerAPIClient.XUnit.Test", "..\HackerApiClientTests\HackerAPIClient.XUnit.Test.csproj", "{577EB591-4C36-4D19-B0EF-12C4F1FA4FD2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

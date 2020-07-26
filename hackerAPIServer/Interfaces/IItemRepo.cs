@@ -11,8 +11,6 @@ namespace hackerAPI.Client.Interfaces {
 
         Item getNewsestStoryById(int id);
 
-        Task<List<int>> getAsyncStories(int id);
-
-        Task<List<Item>> getAsyncStoryById(int id);
+       
     }
 }

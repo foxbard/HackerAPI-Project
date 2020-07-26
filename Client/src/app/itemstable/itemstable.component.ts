@@ -1,9 +1,10 @@
+import { Observable } from 'rxjs';
 import { HackerApiService } from './../../services/hackerapi.service';
 
 import { IItem } from './../../interfaces/IItem';
 import { IUser } from './../../interfaces/IUser';
 
-import { Component, OnInit, ViewChild, Input} from '@angular/core';
+import { Component, OnInit, ViewChild, Input, AfterViewInit } from '@angular/core';
 
 
 import { MatPaginator } from '@angular/material/paginator';
@@ -17,7 +18,7 @@ import { ItemstableDataSource} from './itemstable-datasource';
   templateUrl: './itemstable.component.html',
   styleUrls: ['./itemstable.component.sass']
 })
-export class ItemstableComponent implements OnInit {
+export class ItemstableComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<IItem>;
@@ -30,7 +31,6 @@ export class ItemstableComponent implements OnInit {
 
   public loading: boolean;
   public loaded: boolean;
-
 
 
   public selectedItem: any;
@@ -50,7 +50,10 @@ export class ItemstableComponent implements OnInit {
 
   ngOnInit(): void {
     this.callNewestStoriesApi();
+  }
 
+  ngAfterViewInit(): void {
+    //
   }
 
   /**
@@ -59,13 +62,21 @@ export class ItemstableComponent implements OnInit {
   callNewestStoriesApi(): void{
 
       this.hackerApiService.getCurrentApiData().subscribe(data => {
+        console.log('APi DATA: ', data);
         if (data !== undefined){
-          this.data = data;
-          this.dataSource = new ItemstableDataSource(data);
-          this.dataSource.sort = this.sort;
-          this.dataSource.paginator = this.paginator;
-          if (this.table !== undefined){
-            this.table.dataSource = this.dataSource;
+          try{
+            this.data = data;
+            console.log('Data from Api Cache For Table: ', this.data);
+            this.data.filter((item) =>  item !== null);
+            this.dataSource = new ItemstableDataSource(this.data);
+            this.dataSource.sort = this.sort;
+            this.dataSource.paginator = this.paginator;
+            if (this.table !== undefined){
+              this.table.dataSource = this.dataSource;
+            }
+          }
+          catch (err){
+              console.error('JSON Parsing failed', err);
           }
         }
       });

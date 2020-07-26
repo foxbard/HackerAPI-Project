@@ -7,86 +7,78 @@ using System.Threading.Tasks;
 using hackerAPI.Client.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using hackerAPI.Client.models;
+using hackerAPI.Client.Services;
+using System.Runtime.CompilerServices;
+using EasyCaching.Core;
 
 namespace hackerAPI.Client.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ItemsController: ControllerBase
+    public class ItemsController : ControllerBase
     {
-        
-        private readonly string _url = "https://hacker-news.firebaseio.com/v0";
 
-        private readonly IHttpClientFactory _clientFactory;
-        public ItemsController(IHttpClientFactory clientFactory)
+       
+        private readonly IItemService _itemService;
+        private readonly ICacheService _cacheService;
+        
+        public ItemsController(IItemService itemService, ICacheService cacheService)
         {
-            _clientFactory = clientFactory;
-           
+            _itemService = itemService;
+            _cacheService = cacheService;
+
         }
 
-        [HttpGet("getNewStories")]    
-        public ActionResult <List<int>> getNewStories(){
-            var data = Task.FromResult(getAsyncStories("newstories")).Result;
-            
-            if(data != null){
-                return Ok(data.Result);
-            }else {
-                return NotFound();
-            }
+        // used for first load of stories, does not cache at this call.
+        [HttpGet("getNewStoriesIds")]
+        public ActionResult<List<int>> GetNewStoriesNoCache()
+        {
+            var results = Task.FromResult(_itemService.GetAsyncStories("newstories")).Result;
+            return Ok(results.Result);
         }
 
-        [HttpGet("getTopStories")]    
-        public ActionResult <List<int>> getToptories(){
-            var data = Task.FromResult(getAsyncStories("topstories")).Result;
-            
-            if(data != null){
-                return Ok(data.Result);
-            }else {
-                return NotFound();
-            }
+        [HttpGet("getNewStories")]
+        public ActionResult<List<int>> GetNewStories()
+        {
+            // caching in redis
+            var results = _cacheService.StoreItemsInRedisCache("newstories");
+            return results;
+
         }
 
-        [HttpGet("getBestStories")]    
-        public ActionResult <List<int>> getBestStories(){
-            var data = Task.FromResult(getAsyncStories("beststories")).Result;
-            
-            if(data != null){
-                return Ok(data.Result);
-            }else {
-                return NotFound();
-            }
+        [HttpGet("getTopStories")]
+        public ActionResult<List<int>> GetTopStories()
+        {
+            // caching in redis
+            var results = _cacheService.StoreItemsInRedisCache("topstories");
+            return results;
+
         }
 
-        
+        [HttpGet("getBestStories")]
+        public ActionResult<List<int>> GetBestStories()
+        {
+            // caching in redis
+            var results = _cacheService.StoreItemsInRedisCache("beststories");
+            return results;
+        }
+
+
         [HttpGet("getStoryById/{id}")]
-        public ActionResult <Item> getNewestStoryById(int id){
-            var data = Task.FromResult(getAsyncStoryById(id)).Result;
-            if(data != null){
+        public ActionResult<Item> GetNewestStoryById(int id)
+        {
+            var data = Task.FromResult(_itemService.GetAsyncStoryById(id)).Result;
+            if (data != null)
+            {
                 return Ok(data.Result);
-            }else {
+            }
+            else
+            {
                 return NotFound();
             }
         }
 
 
 
-
-        #region Async Tasks
-        
-            private async Task<List<int>> getAsyncStories(string category){
-                var client = _clientFactory.CreateClient();
-                client.DefaultRequestHeaders.Add("Accept-Content","application/json");
-                var data = await client.GetFromJsonAsync<List<int>>($"{_url}/{category}.json");
-                return data.ToList();
-            }
-
-            // Get Item by ID and return single Item;
-            private async Task<Item> getAsyncStoryById(int id){
-                var client = _clientFactory.CreateClient();
-                var resultItem = await client.GetFromJsonAsync<Item>($"{_url}/item/{id}.json");
-                return resultItem;
-            }
-
-        #endregion
     }
 }

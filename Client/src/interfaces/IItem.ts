@@ -10,19 +10,19 @@ enum ItemTypes {
 
 export interface IItem {
   id: number;
-  deleted: boolean;
-  type: ItemTypes;
+  deleted?: boolean;
+  type?: ItemTypes;
   by: string;
-  time: number;
+  time?: number;
   text: string;
-  dead: boolean;
-  parent: string;
-  poll: any;
-  kids: number[];
+  dead?: boolean;
+  parent?: string;
+  poll?: any;
+  kids?: number[];
   url: URL;
-  score: number;
+  score?: number;
   title: string;
-  parts: number[];
-  descendents: number;
+  parts?: number[];
+  descendents?: number;
 
 }

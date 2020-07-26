@@ -11,6 +11,7 @@ import { map, shareReplay, take } from 'rxjs/operators';
 
 import { IItem } from 'src/interfaces/IItem';
 import { ItemstableDataSource } from '../itemstable/itemstable-datasource';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-nav',
@@ -33,9 +34,7 @@ export class NavComponent implements OnInit{
   public Users: any;
   public data: IItem[] = [];
   public dataSource: ItemstableDataSource;
-  // public sort: any;
-  // public paginator: any;
-  // public table: any;
+  
 
 
 
@@ -50,7 +49,7 @@ export class NavComponent implements OnInit{
   }
 
   ngOnInit(): void{
-    this.callNewestStoriesApi();
+    this.callNewestStories();
   }
 
   /**
@@ -86,22 +85,45 @@ export class NavComponent implements OnInit{
     // update data being sent
   }
 
+
+  /**
+   * @description loads intial stories and caches
+   */
+  callNewestStories(): void{
+
+    this.hackerApiService.getNewestStoriesItems().subscribe((items) => {
+      try{
+        this.data = items;
+        console.log('Data Retrieved: ', this.data, items);
+        this.tableVisibilityState = 'visible';
+        this.spinnerVisibiltyState = 'hidden';
+        this.hackerApiService.setCurrentApiData(this.data);
+      }catch (err){
+        console.error('JSON parsing has failed!', err);
+      }
+    }).add(() => {
+        // Load other items into backend cache;
+        this.hackerApiService.getTopStoriesItems().subscribe();
+        this.hackerApiService.getBestStoriesItems().subscribe();
+    });
+  }
+
   /**
    * @description gets new stories
    */
   callNewestStoriesApi(): void{
-
-    this.hackerApiService.getNewestStoriesItems().forEach( ids => {
-      this.callProcessStories(ids);
-    });
+      this.hackerApiService.getNewestStoriesItems().subscribe(stories => {
+        this.callProcessStories(stories);
+      })
   }
 
   /**
    * @description gets top stories
    */
   callTopStoriesApi(): void{
-    this.hackerApiService.getTopStoriesItems().forEach( ids => {
-      this.callProcessStories(ids);
+    this.hackerApiService.getTopStoriesItems().subscribe(stories => {
+      console.log('%c TOPSTORIES DATA: ======> ', ('color: green'), stories);
+      this.callProcessStories(stories);
     });
   }
 
@@ -109,8 +131,8 @@ export class NavComponent implements OnInit{
    * @description gets best stories
    */
   callBestStoriesApi(): void{
-    this.hackerApiService.getBestStoriesItems().forEach( ids => {
-      this.callProcessStories(ids);
+    this.hackerApiService.getBestStoriesItems().subscribe( stories => {
+      this.callProcessStories(stories);
     });
   }
 
@@ -118,23 +140,11 @@ export class NavComponent implements OnInit{
    * @description processes story item ids and sets table/spinner visibility status.
    * @param ids number[] value to process
    */
-  callProcessStories(ids: number[]): void{
-    ids.forEach(id => {
-      if (id !== null){
-        this.hackerApiService.getStoryByItemId(id)
-        .toPromise()
-        .then( res => {
-          this.data.push(res); })
-        .then(() => {
-          this.tableVisibilityState = 'visible';
-          this.spinnerVisibiltyState = 'hidden';
-          this.hackerApiService.setCurrentApiData(this.data);
-        })
-        .catch( err => {
-          console.error('Unable to retrieve item based on id of ', id, err);
-        });
-      }
-    });
+  callProcessStories(stories: IItem[]): void{
+    
+    this.tableVisibilityState = 'visible';
+    this.spinnerVisibiltyState = 'hidden';
+    this.hackerApiService.setCurrentApiData(stories);
   }
 
 

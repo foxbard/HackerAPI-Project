@@ -18,7 +18,7 @@ export class FilterTitlesComponent implements OnInit {
   filteredOptions: Observable<any>;
 
 
-  @Input() userData: IItem[] = [];
+  @Input() userData: any[] = [];
   @Output() updateFilteredData: IItem[];
   @Output() updateFiltered = new EventEmitter();
 
@@ -28,7 +28,7 @@ export class FilterTitlesComponent implements OnInit {
   ngOnInit(): void {
     this.filteredOptions = this.filterControl.valueChanges
       .pipe(
-        tap((v) => {console.log('Value is changing', v); }),
+        // tap((v) => {console.log('Value: ', v); }),
         startWith(''),
         map(value => this._filter(value))
       );
@@ -40,22 +40,23 @@ export class FilterTitlesComponent implements OnInit {
    */
   private _filter(value: string): any{
     let filterValue = '';
-    this.hackerApiService.getCurrentApiData().subscribe(res => this.userData = res);
+    this.hackerApiService.getCurrentApiData().subscribe((res: any) => this.userData = res);
     if (value.toLowerCase !== undefined){
         filterValue = value.toLowerCase();
-
-        this.updateFilteredData = this.userData.filter(story => {
-          if (story !== null){
-            if (story.title.toLowerCase().includes(filterValue)){
-              return true;
+        if (this.userData !== undefined){
+          this.updateFilteredData = this.userData.filter(story => {
+            if (story !== null){
+              if (story.title.toLowerCase().includes(filterValue)){
+                return true;
+              }
             }
-          }
-        });
-        this.hackerApiService.setFilteredData(this.updateFilteredData);
-        this.updateFiltered.emit(this.updateFilteredData);
-        return this.updateFilteredData;
+          });
+          this.hackerApiService.setFilteredData(this.updateFilteredData);
+          this.updateFiltered.emit(this.updateFilteredData);
+          return this.updateFilteredData;
+        }
     }
-    if (filterValue === undefined){
+    if (filterValue === ''){
       return [''];
     }
   }

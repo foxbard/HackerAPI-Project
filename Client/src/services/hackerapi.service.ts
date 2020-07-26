@@ -28,7 +28,7 @@ const httpOptions = {
 @Injectable()
 export class HackerApiService {
 
-
+  public exposedBaseURL = apiBaseURL;
 
   private selectedUser = new BehaviorSubject({
     id: 'Select a author from the "By" Column to see more info about that user'
@@ -41,7 +41,7 @@ export class HackerApiService {
 
   private isBuffering = new BehaviorSubject(false);
   private filteredData = new BehaviorSubject([]);
-  private apiData = new BehaviorSubject([]);
+  private apiData = new BehaviorSubject<IItem[]>([]);
 
   currentSelectedUser = this.selectedUser.asObservable();
   bufferState = this.isBuffering.asObservable();
@@ -66,6 +66,7 @@ export class HackerApiService {
    * @description gets current data for Items in Observable
    */
   getCurrentApiData(): Observable<IItem[]>{
+    console.log('Current Api Data Cache: ', this.currentApiData);
     return this.currentApiData;
   }
 
@@ -73,9 +74,23 @@ export class HackerApiService {
    * @description Stores current data in Observable
    */
   setCurrentApiData(itemsArray: IItem[]): void{
+    console.log('Setting Current Items Data: ', itemsArray);
     this.apiData.next(itemsArray);
   }
 
+
+
+
+  /**
+   * @description Returns latest stories with no caching.
+   */
+  getNewestStoriesItemsNoCache(): Observable<any>{
+    return this.http.get<number[]>(`${apiBaseURL}/items/getNewStories/nocache`, {headers: httpOptions.headers})
+      .pipe(
+        tap((res) => console.log('Results:', res)),
+        catchError(this.errorHandler('getNewestStoriesItems', []))
+      );
+  }
 
   /**
    * @description Returns latest stories.

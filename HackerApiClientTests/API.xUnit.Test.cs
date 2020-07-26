@@ -8,7 +8,7 @@ using Xunit;
 
 namespace HackerAPI.Client.Integration.Test
 {
-    public class APIIntegrationTest
+    public class APIxUnitTest
     {
         [Fact]
         public async Task Test_GET()

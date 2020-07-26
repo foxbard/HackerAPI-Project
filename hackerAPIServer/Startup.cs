@@ -15,6 +15,10 @@ using Microsoft.Extensions.Logging;
 
 //using Swashbuckle.AspNetCore.Swagger;
 using hackerAPIClient.Client.Swagger;
+using hackerAPI.Client.Services;
+using hackerAPI.Client.models;
+using Microsoft.Extensions.Options;
+using EasyCaching.Core.Configurations;
 //using Swashbuckle.Swagger;
 
 namespace hackerAPIClient
@@ -35,7 +39,7 @@ namespace hackerAPIClient
         {
 
             services.AddCors(options => {
-                options.AddPolicy("AllowOrigin", 
+                options.AddPolicy("AllowOrigin",
                     builder => {
                         builder.WithOrigins("http://localhost:4200")
                             .AllowAnyHeader()
@@ -44,6 +48,24 @@ namespace hackerAPIClient
                     });
             });
 
+
+
+
+            services.AddEasyCaching(options =>
+            {
+                options.UseRedis(configure: redisConfig =>
+                {
+                    redisConfig.DBConfig.Endpoints.Add(new ServerEndPoint(host: "localhost", port: 6379));
+                    redisConfig.DBConfig.AllowAdmin = true;
+                },
+                    name: "redisCache"
+                );
+            });
+
+
+            services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IItemService, ItemService>();
+            services.AddSingleton<ICacheService, CacheService>();
 
             
 
@@ -56,7 +78,7 @@ namespace hackerAPIClient
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddHttpClient();
-
+            
             
         }
 
@@ -89,6 +111,8 @@ namespace hackerAPIClient
                 endpoints.MapControllers();
             });
 
+
+            // swagger
             var swaggerOptions = new SwaggerOptions();
             Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
 
@@ -101,6 +125,8 @@ namespace hackerAPIClient
             {
                 option.SwaggerEndpoint(swaggerOptions.UiEndpoint, swaggerOptions.Description);
             });
+
+            
         }
     }
 }

@@ -8,12 +8,26 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 
 import { ItemstableComponent } from './itemstable.component';
+import { DebugElement } from '@angular/core';
+import { By } from '@angular/platform-browser';
 
 describe('ItemstableComponent', () => {
   let component: ItemstableComponent;
   let fixture: ComponentFixture<ItemstableComponent>;
+  let debugElement: DebugElement;
+  let serviceStubGetStoriesItems: any;
 
   beforeEach(async(() => {
+
+    serviceStubGetStoriesItems = {
+      getNewestStoriesItems: () => [
+        {
+          id: 0,
+          title: 'test',
+        }
+      ]
+    }
+
     TestBed.configureTestingModule({
       declarations: [ ItemstableComponent ],
       imports: [
@@ -23,7 +37,7 @@ describe('ItemstableComponent', () => {
         MatTableModule,
       ],
       providers: [
-        HackerApiService,
+        { provide: HackerApiService, useValue: serviceStubGetStoriesItems},
         ErrorService,
         HttpClient,
         HttpHandler,
@@ -34,10 +48,31 @@ describe('ItemstableComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ItemstableComponent);
     component = fixture.componentInstance;
+    debugElement = fixture.debugElement;
     fixture.detectChanges();
   });
 
   it('should compile', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should be loading', () => {
+    expect(component.loading).toBeFalsy();
+  });
+
+  it('should show spinner and hide table when loading data', () => {
+    expect(component.spinnerVisibiltyState).toEqual('visible');
+    expect(component.tableVisibilityState).toEqual('hidden');
+  });
+
+  it('should be loaded', () => {
+    expect(component.loading).toBeFalsy();
+  });
+
+  it('should call callNewestStoriesApi()', () => {
+    expect(component.callNewestStoriesApi).toBeDefined();
+    expect(component.callNewestStoriesApi).toBeTruthy();
+  });
+
+
 });

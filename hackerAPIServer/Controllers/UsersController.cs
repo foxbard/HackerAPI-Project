@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using hackerAPI.Client.models;
 using hackerAPI.Client.Interfaces;
+using hackerAPI.Client.Services;
+using EasyCaching.Core;
 
 namespace hackerAPI.Client.Controllers
 {
@@ -14,41 +16,33 @@ namespace hackerAPI.Client.Controllers
     [Route("api/[controller]")]
     public class UsersController: ControllerBase
     {
-        private readonly string _url = "https://hacker-news.firebaseio.com/v0";
+      
 
-        private readonly IHttpClientFactory _clientFactory;
-        public UsersController(IHttpClientFactory clientFactory)
+        private readonly IUserService _userService;
+        private readonly ICacheService _cacheService;
+
+        public UsersController(IUserService userService, ICacheService cacheService)
         {
-            _clientFactory = clientFactory;
-            
+            _userService = userService;
+            _cacheService = cacheService;
+
+           
+
         }
 
         [HttpGet("getUserByName/{name}")]
         public ActionResult<User> getUserByName(string name){
-            var data = Task.FromResult(getAsyncUser(name)).Result.Result;
-            return Ok(data);
+            var data = Task.FromResult(_userService.getAsyncUserByName(name)).Result;
+            return Ok(data.Result);
         }
 
         [HttpGet("getUserItemsByName/{name}")]
         public ActionResult <User> getUserItemsByName(string name){
-            var data = Task.FromResult(GetAsyncUserSubmittedItems(name));
-            return Ok(data);
+            var results = _cacheService.ProcessRedisCache(name, "user");
+            return results;
         }
 
 
-    #region Async Tasks
-
-        private async Task<User> getAsyncUser(string name){
-            var client = _clientFactory.CreateClient();
-            var userData = await client.GetFromJsonAsync<User>($"{_url}/user/{name.ToLower()}.json");
-            return userData;
-        }
-        private async Task<List<int>> GetAsyncUserSubmittedItems(string name){
-            var client = _clientFactory.CreateClient();
-            var userItems = await client.GetFromJsonAsync<User>($"{_url}/user/{name.ToLower()}.json");
-            return userItems.submitted;
-        }
-        
-    #endregion
+    
     }
 }
