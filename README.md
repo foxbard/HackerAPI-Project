@@ -28,6 +28,7 @@
 
 
 ## Notes
+* Initial caching may take a bit, sometimes as long as 80000ms. After that though data will load very quickly.
 * I kept the testing small, as I just wanted to show that I can do integrated and unit testing. In a real world situation this would be much more extensive, especially for endpoints
 * All tests passed on my local (famous last words lol)
 * Was also going to add that a stories title would appear when viewing a users submitted stories. Not really liking that dropdown :(
