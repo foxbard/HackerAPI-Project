@@ -28,7 +28,7 @@
 
 ## Known Issues
 * When Integration testing, caching may cause first test to fail.
-* Initial caching may take a bit, sometimes as long as 80000ms. After that though data will load from cache.
+* Initial caching may take a bit, sometimes as long as 33s. After that though data will load from cache.
 * Sometimes server will return first value as null from HackerAPI.
 
 ## Notes
