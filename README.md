@@ -14,6 +14,7 @@
   
 ## What it does:
 * Uses the awesome HackerNews API https://github.com/HackerNews/API to pull newest, best or top stories and angular material to make it look good :D!
+* Caches using redis on backend. 
 * Stories can be filtered via title, and selected.
 * A user can be selected and their info viewed
 * A users list of submitted story items can be viewed and the value clicked to redirect to link in a new tab.
@@ -27,5 +28,5 @@
 ## Notes
 * I kept the testing small, as I just wanted to show that I can do integrated and unit testing. In a real world situation this would be much more extensive, especially for endpoints
 * All tests passed on my local (famous last words lol)
-* Was also going to add that a stories title would appear when viewing users submitted stories. Not really liking that dropdown :(
-* wanted to add a lot of things like making sure observables are unsubcribed, as well as managing handling of incoming data in a different way. Also wanted to add so that caching is used on backend to handle data, api data being sent to client, decided to wrap it up though.
+* Was also going to add that a stories title would appear when viewing a users submitted stories. Not really liking that dropdown :(
+* wanted to add a lot of things like making sure observables are unsubcribed, as well as managing handling of incoming data in a different way. decided to wrap it up though.
