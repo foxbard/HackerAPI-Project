@@ -22,7 +22,7 @@ export class NavComponent implements OnInit{
 
   public mobileQuery: MediaQueryList;
   private mobileQueryListener : () => void;
-  public pageTitle = 'Now Viewing Newest Stories';
+  public pageTitle = 'Loading Newest Stories';
 
   public typeStories = 'new';
   public loading: boolean;
@@ -61,19 +61,19 @@ export class NavComponent implements OnInit{
     this.spinnerVisibiltyState = 'visible';
     switch (value){
       case 'new': {
-        this.pageTitle = `Now Viewing Newest Stories`;
+        this.pageTitle = `Loading Newest Stories`;
         this.typeStories = 'new';
         this.callNewestStoriesApi();
         break;
       }
       case 'top':{
-        this.pageTitle = `Now Viewing Top Stories`;
+        this.pageTitle = `Loading Top Stories`;
         this.typeStories = 'top';
         this.callTopStoriesApi();
         break;
       }
       case 'best':{
-        this.pageTitle = `Now Viewing Best Stories`;
+        this.pageTitle = `Loading Best Stories`;
         this.typeStories = 'best';
         this.callBestStoriesApi();
         break;
@@ -87,7 +87,7 @@ export class NavComponent implements OnInit{
 
 
   /**
-   * @description loads intial stories and caches
+   * @description loads intial stories and caches other data
    */
   callNewestStories(): void{
 
@@ -98,6 +98,7 @@ export class NavComponent implements OnInit{
         this.tableVisibilityState = 'visible';
         this.spinnerVisibiltyState = 'hidden';
         this.hackerApiService.setCurrentApiData(this.data);
+        this.pageTitle = `Now Viewing Newest Stories`;
       }catch (err){
         console.error('JSON parsing has failed!', err);
       }
@@ -114,6 +115,7 @@ export class NavComponent implements OnInit{
   callNewestStoriesApi(): void{
       this.hackerApiService.getNewestStoriesItems().subscribe(stories => {
         this.callProcessStories(stories);
+        this.pageTitle = `Now Viewing Newest Stories`;
       })
   }
 
@@ -122,8 +124,9 @@ export class NavComponent implements OnInit{
    */
   callTopStoriesApi(): void{
     this.hackerApiService.getTopStoriesItems().subscribe(stories => {
-      console.log('%c TOPSTORIES DATA: ======> ', ('color: green'), stories);
+      // console.log('%c TOPSTORIES DATA: ======> ', ('color: green'), stories);
       this.callProcessStories(stories);
+      this.pageTitle = `Now Viewing Top Stories`;
     });
   }
 
@@ -133,6 +136,7 @@ export class NavComponent implements OnInit{
   callBestStoriesApi(): void{
     this.hackerApiService.getBestStoriesItems().subscribe( stories => {
       this.callProcessStories(stories);
+      this.pageTitle = `Now Viewing Best Stories`;
     });
   }
 
@@ -141,7 +145,7 @@ export class NavComponent implements OnInit{
    * @param ids number[] value to process
    */
   callProcessStories(stories: IItem[]): void{
-    
+
     this.tableVisibilityState = 'visible';
     this.spinnerVisibiltyState = 'hidden';
     this.hackerApiService.setCurrentApiData(stories);
