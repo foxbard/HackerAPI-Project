@@ -32,7 +32,7 @@
 * Sometimes server will return first value as null from HackerAPI.
 
 ## Notes
-* I kept the testing small, as I just wanted to show that I can do integrated and unit testing. In a real world situation this would be much more extensive, especially for endpoints
+* I kept the testing small, as I just wanted to show that I can do integrated and unit testing. In a real world situation this would be much more extensive.
 * All tests passed on my local (famous last words lol)
-* Was also going to add that a stories title would appear when viewing a users submitted stories. Not really liking that dropdown :(
+* I was also going to add stories title would appear when viewing a users submitted stories. Not really liking that dropdown :(
 * wanted to add a lot of things like making sure observables are unsubcribed, as well as managing handling of incoming data in a different way. decided to wrap it up though.
