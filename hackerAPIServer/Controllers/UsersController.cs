@@ -31,13 +31,13 @@ namespace hackerAPI.Client.Controllers
         }
 
         [HttpGet("getUserByName/{name}")]
-        public ActionResult<User> getUserByName(string name){
+        public IActionResult getUserByName(string name){
             var data = Task.FromResult(_userService.getAsyncUserByName(name)).Result;
             return Ok(data.Result);
         }
 
         [HttpGet("getUserItemsByName/{name}")]
-        public ActionResult <User> getUserItemsByName(string name){
+        public IActionResult getUserItemsByName(string name){
             var results = _cacheService.ProcessRedisCache(name, "user");
             return results;
         }

@@ -10,6 +10,7 @@ using hackerAPI.Client.models;
 using hackerAPI.Client.Services;
 using System.Runtime.CompilerServices;
 using EasyCaching.Core;
+using hackerAPI.Client.Models;
 
 namespace hackerAPI.Client.Controllers
 {
@@ -29,43 +30,45 @@ namespace hackerAPI.Client.Controllers
 
         }
 
-        // used for first load of stories, does not cache at this call.
+
+        
+        
         [HttpGet("getNewStoriesIds")]
-        public ActionResult<List<int>> GetNewStoriesNoCache()
+        public IActionResult GetNewStoriesNoCache()
         {
             var results = Task.FromResult(_itemService.GetAsyncStories("newstories")).Result;
-            return Ok(results.Result);
+            return Ok(new ResponseService<List<int>>(results.Result));
         }
 
         [HttpGet("getNewStories")]
-        public ActionResult<List<int>> GetNewStories()
+        public IActionResult GetNewStories([FromQuery] ItemsParams ItemsParams)
         {
             // caching in redis
-            var results = _cacheService.StoreItemsInRedisCache("newstories");
+            var results = _cacheService.StoreItemsInRedisCache("newstories", ItemsParams);
             return results;
 
         }
 
         [HttpGet("getTopStories")]
-        public ActionResult<List<int>> GetTopStories()
+        public IActionResult GetTopStories([FromQuery] ItemsParams ItemsParams)
         {
             // caching in redis
-            var results = _cacheService.StoreItemsInRedisCache("topstories");
+            var results = _cacheService.StoreItemsInRedisCache("topstories", ItemsParams);
             return results;
 
         }
 
         [HttpGet("getBestStories")]
-        public ActionResult<List<int>> GetBestStories()
+        public IActionResult GetBestStories([FromQuery] ItemsParams ItemsParams)
         {
             // caching in redis
-            var results = _cacheService.StoreItemsInRedisCache("beststories");
+            var results = _cacheService.StoreItemsInRedisCache("beststories", ItemsParams);
             return results;
         }
 
 
         [HttpGet("getStoryById/{id}")]
-        public ActionResult<Item> GetNewestStoryById(int id)
+        public IActionResult GetNewestStoryById(int id)
         {
             var data = Task.FromResult(_itemService.GetAsyncStoryById(id)).Result;
             if (data != null)

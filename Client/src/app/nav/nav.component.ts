@@ -7,11 +7,11 @@ import {ChangeDetectorRef,  OnDestroy} from '@angular/core';
 // Services
 import { HackerApiService } from './../../services/hackerapi.service';
 import { Observable } from 'rxjs';
-import { map, shareReplay, take } from 'rxjs/operators';
+import { map, shareReplay, take, tap } from 'rxjs/operators';
 
 import { IItem } from 'src/interfaces/IItem';
 import { ItemstableDataSource } from '../itemstable/itemstable-datasource';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+
 
 @Component({
   selector: 'app-nav',
@@ -91,29 +91,43 @@ export class NavComponent implements OnInit{
    */
   callNewestStories(): void{
 
-    this.hackerApiService.getNewestStoriesItems().subscribe((items) => {
-      try{
-        this.data = items;
-        console.log('Data Retrieved: ', this.data, items);
-        this.tableVisibilityState = 'visible';
-        this.spinnerVisibiltyState = 'hidden';
-        this.hackerApiService.setCurrentApiData(this.data);
-        this.pageTitle = `Now Viewing Newest Stories`;
-      }catch (err){
-        console.error('JSON parsing has failed!', err);
+    this.hackerApiService.getNewestStoriesItems()
+    .subscribe((items: any) => {
+      let ddata = items.data !== undefined ? items.data : items;
+      if (ddata.length !== 0){
+        try{
+          ddata = ddata.filter(item => item !== null);
+          this.data = ddata;
+
+          this.tableVisibilityState = 'visible';
+          this.spinnerVisibiltyState = 'hidden';
+          // this.data.filter((item) => item !== null);
+          console.log('Data Retrieved: ', this.data);
+          this.hackerApiService.setCurrentApiData(this.data);
+          this.pageTitle = `Now Viewing Newest Stories`;
+        }catch (err){
+          console.error(err);
+        }
+      }else {
+        console.log('No data found.');
+        this.pageTitle = 'Unable to Connect to Api... Standby';
+        setTimeout(() => {
+          this.callNewestStories();
+        }, 2000);
       }
     }).add(() => {
-        // Load other items into backend cache;
-        this.hackerApiService.getTopStoriesItems().subscribe();
-        this.hackerApiService.getBestStoriesItems().subscribe();
-    });
+      // Load other items into backend cache;
+      this.hackerApiService.getTopStoriesItems().subscribe();
+      this.hackerApiService.getBestStoriesItems().subscribe();
+  });
   }
 
   /**
    * @description gets new stories
    */
   callNewestStoriesApi(): void{
-      this.hackerApiService.getNewestStoriesItems().subscribe(stories => {
+      this.hackerApiService.getNewestStoriesItems()
+      .subscribe((stories: any) => {
         this.callProcessStories(stories);
         this.pageTitle = `Now Viewing Newest Stories`;
       })

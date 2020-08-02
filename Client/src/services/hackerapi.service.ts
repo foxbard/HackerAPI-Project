@@ -96,7 +96,8 @@ export class HackerApiService {
    * @description Returns latest stories.
    */
   getNewestStoriesItems(): Observable<any>{
-    return this.http.get<number[]>(`${apiBaseURL}/items/getNewStories/`, {headers: httpOptions.headers})
+    return this.http.get<number[]>(`${apiBaseURL}/items/getNewStories?PageNumber=1&PageSize=165&PageSizeMax=200`,
+    {headers: httpOptions.headers})
       .pipe(
         catchError(this.errorHandler('getNewestStoriesItems', []))
       );
@@ -107,7 +108,7 @@ export class HackerApiService {
    * @description Returns top stories.
    */
   getTopStoriesItems(): Observable<any>{
-    return this.http.get<IItem>(`${apiBaseURL}/items/getTopStories`)
+    return this.http.get<IItem>(`${apiBaseURL}/items/getTopStories?PageNumber=1&PageSize=50&PageSizeMax=100`)
       .pipe(
         catchError(this.errorHandler('getTopStoriesItems', []))
       );
@@ -117,7 +118,7 @@ export class HackerApiService {
    * @description Returns best stories.
    */
   getBestStoriesItems(): Observable<any>{
-    return this.http.get<IItem>(`${apiBaseURL}/items/getBestStories`)
+    return this.http.get<IItem>(`${apiBaseURL}/items/getBestStories?PageNumber=1&PageSize=50&PageSizeMax=100`)
     .pipe(
       catchError(this.errorHandler('getBestStoriesItems', []))
     );

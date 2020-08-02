@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using hackerAPI.Client.models;
+using hackerAPI.Client.Models;
 
 namespace hackerAPI.Client.Interfaces {
     public interface IItemRepo{
 
-        List<int> getNewStories();
-        List<int> getTopStories();
-        List<int> getBestStories();
+        List<int> GetNewStories(ItemsParams itemsParams);
+        List<int> GetTopStories(ItemsParams itemsParams);
+        List<int> GetBestStories(ItemsParams itemsParams);
 
-        Item getNewsestStoryById(int id);
+        Item GetNewsestStoryById(int id);
 
        
     }
