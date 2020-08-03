@@ -80,6 +80,12 @@ export class HackerApiService {
 
 
 
+  getItemsFromCacheByCategory(category: string): Observable<any>{
+    return this.http.get<IItem[]>(`${apiBaseURL}/items/getItemsCachedByCategory/${category}`, {headers: httpOptions.headers})
+      .pipe(
+        catchError(this.errorHandler('getItemsFromCache', []))
+      )
+  }
 
   /**
    * @description Returns latest stories with no caching.
@@ -96,7 +102,7 @@ export class HackerApiService {
    * @description Returns latest stories.
    */
   getNewestStoriesItems(): Observable<any>{
-    return this.http.get<number[]>(`${apiBaseURL}/items/getNewStories?PageNumber=1&PageSize=165&PageSizeMax=200`,
+    return this.http.get<number[]>(`${apiBaseURL}/items/getNewStories?PageNumber=1&PageSize=80&PageSizeMax=200`,
     {headers: httpOptions.headers})
       .pipe(
         catchError(this.errorHandler('getNewestStoriesItems', []))
@@ -108,7 +114,7 @@ export class HackerApiService {
    * @description Returns top stories.
    */
   getTopStoriesItems(): Observable<any>{
-    return this.http.get<IItem>(`${apiBaseURL}/items/getTopStories?PageNumber=1&PageSize=50&PageSizeMax=100`)
+    return this.http.get<IItem>(`${apiBaseURL}/items/getTopStories?PageNumber=1&PageSize=80&PageSizeMax=100`)
       .pipe(
         catchError(this.errorHandler('getTopStoriesItems', []))
       );
@@ -118,7 +124,7 @@ export class HackerApiService {
    * @description Returns best stories.
    */
   getBestStoriesItems(): Observable<any>{
-    return this.http.get<IItem>(`${apiBaseURL}/items/getBestStories?PageNumber=1&PageSize=50&PageSizeMax=100`)
+    return this.http.get<IItem>(`${apiBaseURL}/items/getBestStories?PageNumber=1&PageSize=80&PageSizeMax=100`)
     .pipe(
       catchError(this.errorHandler('getBestStoriesItems', []))
     );

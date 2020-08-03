@@ -1,4 +1,5 @@
-﻿using hackerAPI.Client.Models;
+﻿using hackerAPI.Client.models;
+using hackerAPI.Client.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,8 @@ namespace hackerAPI.Client.Services
 {
     public interface ICacheService
     {
-
-        IActionResult StoreItemsInRedisCache(string key, ItemsParams itemsParams);
+        IEnumerable<Item> GetItemsFromCache(string keyValue);
+        Task<IEnumerable<Item>> StoreItemsInRedisCache(string keyValue, ItemsParams itemsParams);
         IActionResult ProcessRedisCache(string name, string v);
     }
 }

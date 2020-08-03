@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace hackerAPI.Client.Services
         private readonly IItemService _itemService;
         private readonly IUserService _userService;
         private readonly int timeAlive = 500;
-        
+
         public CacheService(IItemService itemService, IUserService userService, IEasyCachingProviderFactory cachingProviderFactory)
         {
             _itemService = itemService;
@@ -32,21 +33,51 @@ namespace hackerAPI.Client.Services
 
         }
 
-       /* public async Task StoreItems(string keyValue, List<Item> data)
+        //Get all Items from redis cache with keyValue
+        public IEnumerable<Item> GetItemsFromCache(string keyValue)
         {
-           var task = await this.cachingProvider.SetAsync<List<Item>>(keyValue, data, TimeSpan.FromSeconds(timeAlive));
-            return;
-            
-        }*/
+            var itemsList = new List<Item>();
+            if (this.cachingProvider.Exists(keyValue))
+            {
+                itemsList = JsonConvert.DeserializeObject<List<Item>>(this.cachingProvider.Get<string>(keyValue).Value);
+                return itemsList.OrderBy(item => item.id);
+                
+            }
+            return itemsList;
+        }
+
+        public async Task<IEnumerable<Item>> StoreItemsAsync(string keyValue, ItemsParams itemsParams, int? totalItems = null)
+        {
+            var itemsList = new List<Item>();
+            // this.cachingProvider.Flush();
+
+            var items = await Task.FromResult(_itemService.GetAsyncStories(keyValue)).Result;
+
+            foreach (var item in items)
+            {
+                var i = Task.FromResult(_itemService.GetAsyncStoryById(item));
+                itemsList.Add(i.Result.Result);
+                var converted = JsonConvert.SerializeObject(itemsList);
+                this.cachingProvider.Set(keyValue, converted, TimeSpan.FromSeconds(timeAlive));
+                if(itemsList.Count >= itemsParams.PageSize && totalItems == null)
+                {
+                    itemsList.OrderBy(item => item.id);
+                    break;
+                }
+            }
+            return itemsList;
+        }
+
+
         public IActionResult ProcessRedisCache(string keyValue, string category)
         {
 
-            
+
             if (!this.cachingProvider.Exists(keyValue))
             {
-                
-                
-                if(category == "user")
+
+
+                if (category == "user")
                 {
                     var ukeyValue = "user_" + keyValue;
                     var data = Task.FromResult(_userService.GetAsyncUserSubmittedItems(keyValue)).Result;
@@ -75,97 +106,41 @@ namespace hackerAPI.Client.Services
                         return NotFound();
                     }
                 }
-                
 
-                
+
+
             }
             else
             {
                 if (category == "user")
                 {
-                    return Ok(this.cachingProvider.Get<List<int>>("user_"+keyValue).Value);
+                    return Ok(this.cachingProvider.Get<List<int>>("user_" + keyValue).Value);
                 }
                 else
                 {
                     return Ok(this.cachingProvider.Get<List<int>>(keyValue).Value);
                 }
-                
+
             }
         }
 
-        public IActionResult StoreItemsInRedisCache(string keyValue, ItemsParams itemsParams)
+        public async Task<IEnumerable<Item>> StoreItemsInRedisCache(string keyValue, ItemsParams itemsParams)
         {
-            var itemsList = new List<Item>();
 
 
-                if (!this.cachingProvider.Exists(keyValue))
-                {
-                    var data = Task.FromResult(_itemService.GetAsyncStories(keyValue)).Result.Result;
+            _ = StoreItemsAsync(keyValue, itemsParams, 500);
+            var itemsList = await StoreItemsAsync(keyValue, itemsParams);
 
-                    foreach (var d in data)
-                    {
-                        try
-                        {
-                            itemsList.Add(Task.FromResult(_itemService.GetAsyncStoryById(d)).Result.Result);
-                        if (itemsList.Count > itemsParams.PageSize)
-                        {
-                            // cache full data in background
-                            var converted = JsonConvert.SerializeObject(itemsList);
-                            this.cachingProvider.RemoveAsync(keyValue).Wait();
-                            this.cachingProvider.SetAsync(keyValue, converted, TimeSpan.FromSeconds(timeAlive));
+            var pages = JsonConvert.DeserializeObject<List<Item>>
+                            (this.cachingProvider.Get<string>(keyValue).Value);
 
-                        }
-                        else if (itemsList.Count == itemsParams.PageSize)
-                                {
-                                    // cache and paginate ItemsParams.pageSizeMax
-                                    var page = itemsList
-                                        .OrderBy(item => item.id)
-                                        .Skip((itemsParams.PageNumber - 1) * itemsParams.PageSize)
-                                        .Take(itemsParams.PageSize)
-                                        .ToList();
+            var paged = pages
+                        .OrderBy(item => item.id)
+                        .Skip((itemsParams.PageNumber - 1) * itemsParams.PageSize)
+                        .Take(itemsParams.PageSize)
+                        .ToList();
+            return paged;
 
-                                    var converted = JsonConvert.SerializeObject(page);
-
-                                this.cachingProvider.SetAsync(keyValue, converted, TimeSpan.FromSeconds(timeAlive));
-                                    var returnData = this.cachingProvider.Get<string>(keyValue);
-                                    if (returnData != null)
-                                    {
-                                        var items = itemsList;
-                                    
-                                        return Ok(page);
-                                    }
-                                    else
-                                    {
-                                        return NotFound();
-                                    }
-                            } 
-                        }
-                        catch(AggregateException err)
-                        {
-                            throw err;
-                            
-                        }
-                        
-                    }
-
-
-
-
-
-            }
-            else
-            {
-                var value = JsonConvert.DeserializeObject<List<Item>>(this.cachingProvider.Get<string>(keyValue).Value);
-                var paginatedData = value
-                                    .OrderBy(item => item.id)
-                                    .Skip((itemsParams.PageNumber - 1) * itemsParams.PageSize)
-                                    .Take(itemsParams.PageSize)
-                                    .ToList();
-
-                return Ok(paginatedData);
-            }
-            return Ok();
-            }
- 
+        }
     }
 }

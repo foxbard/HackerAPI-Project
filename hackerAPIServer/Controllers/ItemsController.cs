@@ -34,41 +34,85 @@ namespace hackerAPI.Client.Controllers
         
         
         [HttpGet("getNewStoriesIds")]
-        public IActionResult GetNewStoriesNoCache()
+        public async Task<IActionResult> GetNewStoriesNoCache()
         {
-            var results = Task.FromResult(_itemService.GetAsyncStories("newstories")).Result;
-            return Ok(new ResponseService<List<int>>(results.Result));
+            var results = await _itemService.GetAsyncStories("newstories");
+            if(results != null)
+            {
+                return Ok(new ResponseService<List<int>>(results));
+            }
+            else
+            {
+                return NotFound();
+            }
+            
+        }
+
+        // Returns all story items
+        [HttpGet("getItemsCachedByCategory/{category}")]
+        public IActionResult getItemsFromCachedByCategory(string category)
+        {
+            var results =  _cacheService.GetItemsFromCache(category).OrderBy(items => items.id);
+            if(results != null)
+            {
+                return Ok(results);
+            } else
+            {
+                return NotFound();
+            }
+            
         }
 
         [HttpGet("getNewStories")]
-        public IActionResult GetNewStories([FromQuery] ItemsParams ItemsParams)
+        public async Task<IActionResult> GetNewStoriesAsync([FromQuery] ItemsParams itemsParams)
         {
             // caching in redis
-            var results = _cacheService.StoreItemsInRedisCache("newstories", ItemsParams);
-            return results;
+            var results = await _cacheService.StoreItemsInRedisCache("newstories", itemsParams);
+            if (results != null)
+            {
+                return Ok(results);
+            }
+            else
+            {
+                return NotFound();
+            }
 
         }
 
         [HttpGet("getTopStories")]
-        public IActionResult GetTopStories([FromQuery] ItemsParams ItemsParams)
+        public async Task<IActionResult> GetTopStoriesAsync([FromQuery] ItemsParams itemsParams)
         {
             // caching in redis
-            var results = _cacheService.StoreItemsInRedisCache("topstories", ItemsParams);
-            return results;
+            var results = await _cacheService.StoreItemsInRedisCache("topstories", itemsParams);
+            if (results != null)
+            {
+                return Ok(results);
+            }
+            else
+            {
+                return NotFound();
+            }
 
         }
 
         [HttpGet("getBestStories")]
-        public IActionResult GetBestStories([FromQuery] ItemsParams ItemsParams)
+        public async Task<IActionResult> GetBestStoriesAsync([FromQuery] ItemsParams itemsParams)
         {
             // caching in redis
-            var results = _cacheService.StoreItemsInRedisCache("beststories", ItemsParams);
-            return results;
+            var results = await _cacheService.StoreItemsInRedisCache("beststories", itemsParams);
+            if (results != null)
+            {
+                return Ok(results);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
 
         [HttpGet("getStoryById/{id}")]
-        public IActionResult GetNewestStoryById(int id)
+        public IActionResult GetNewestStoryByIdAsync(int id)
         {
             var data = Task.FromResult(_itemService.GetAsyncStoryById(id)).Result;
             if (data != null)

@@ -7,7 +7,7 @@ import {ChangeDetectorRef,  OnDestroy} from '@angular/core';
 // Services
 import { HackerApiService } from './../../services/hackerapi.service';
 import { Observable } from 'rxjs';
-import { map, shareReplay, take, tap } from 'rxjs/operators';
+import { map, shareReplay, take, tap, delay, delayWhen, takeWhile, distinctUntilChanged } from 'rxjs/operators';
 
 import { IItem } from 'src/interfaces/IItem';
 import { ItemstableDataSource } from '../itemstable/itemstable-datasource';
@@ -96,14 +96,15 @@ export class NavComponent implements OnInit{
       let ddata = items.data !== undefined ? items.data : items;
       if (ddata.length !== 0){
         try{
-          ddata = ddata.filter(item => item !== null);
+          ddata = ddata.filter((item: IItem) => item !== null);
           this.data = ddata;
 
           this.tableVisibilityState = 'visible';
           this.spinnerVisibiltyState = 'hidden';
           // this.data.filter((item) => item !== null);
-          console.log('Data Retrieved: ', this.data);
+          // console.log('Data Retrieved: ', this.data);
           this.hackerApiService.setCurrentApiData(this.data);
+
           this.pageTitle = `Now Viewing Newest Stories`;
         }catch (err){
           console.error(err);
@@ -111,26 +112,40 @@ export class NavComponent implements OnInit{
       }else {
         console.log('No data found.');
         this.pageTitle = 'Unable to Connect to Api... Standby';
+        // wait a moment and try to reconnect to API, change this to a better polling method
         setTimeout(() => {
           this.callNewestStories();
         }, 2000);
       }
     }).add(() => {
       // Load other items into backend cache;
-      this.hackerApiService.getTopStoriesItems().subscribe();
-      this.hackerApiService.getBestStoriesItems().subscribe();
-  });
+      this.hackerApiService.getTopStoriesItems()
+      .subscribe((res: any[]) => {
+        this.hackerApiService.getBestStoriesItems().subscribe();
+        this.hackerApiService.getItemsFromCacheByCategory('newstories')
+        .pipe(
+          distinctUntilChanged()
+          )
+        .subscribe(
+          (res2: IItem[]) => {
+            // console.log('Full Results Cache: ', res2);
+            this.callProcessStories(res2);
+          });
+      });
+    });
+      // reload additonal data from backend.
   }
 
   /**
    * @description gets new stories
    */
   callNewestStoriesApi(): void{
-      this.hackerApiService.getNewestStoriesItems()
-      .subscribe((stories: any) => {
-        this.callProcessStories(stories);
+    // check APIData local cache first
+    this.hackerApiService.getNewestStoriesItems().subscribe((stories: IItem[]) => {
+        console.log('Current Client API Data', stories);
         this.pageTitle = `Now Viewing Newest Stories`;
-      })
+        this.callProcessStories(stories);
+    });
   }
 
   /**
